@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Mystère à la Mansion</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="icon" href="images/detective.png" type="image/png">
+</head>
+
+<body>
+    <div id="gameContainer">
+        <div id="overlay">
+            <form id="welcomeForm" autocomplete="off">
+                <label for="playerName">Nom:</label>
+                <input type="text" id="playerName" name="playerName" required placeholder="Entrez votre nom">
+
+                <label for="playerColor">Couleur:</label>
+                <select id="playerColor" name="playerColor" required>
+                    <option value="Black">Noir</option>
+                    <option value="Blue">Bleu</option>
+                    <option value="Green">Vert</option>
+                    <option value="Red">Rouge</option>
+                    <option value="White">Blanc</option>
+                    <option value="Yellow">Jaune</option>
+                </select>
+
+                <button type="submit">Rejoindre le jeu</button>
+            </form>
+            <div id="playerList">
+                <p id="waitingMessage" style="display:block;">En attente que le leader commence le jeu...</p>
+                <div id="playersContainer"></div>
+            </div>
+            <div id="gameAlreadyStartedMessage" style="display:none;">
+                Partida já começou. Aguarde o próximo jogo!
+            </div>
+        </div>
+        <div id="playersInGame" style="display: none;">
+            <div id="playersInGameContainer"></div>
+            <div id="playerTurnInfo">
+                <p id="playerTurn">Attente du tour...</p>
+                <p id="yourTurn" style="display: none;">Vous êtes dans la salle: </p>
+            </div>
+        </div>
+        <div id="playerCardsContainer" class="player-cards-container" style="display: none;">
+        </div>
+        <div id="gameActions" class="game-actions" style="display:none;">
+            <h3>À VOTRE TOUR</h3>
+            <button id="moveRoomButton">Changer de Salle</button>
+            <button id="makeHypothesisButton">Faire une Hypothèse</button>
+        </div>
+        <div id="gameBoard" style="display:none;">
+        </div>
+    </div>
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="js/main.js"></script>
+</body>
+
+</html>

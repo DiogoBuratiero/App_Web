@@ -1,0 +1,540 @@
+body, html {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  overflow: hidden;
+  background-color: black; /* Cor de fundo para as laterais */
+}
+
+#gameContainer {
+  background-image: url('../images/tabuleiro.jpg'); /* Ajuste o caminho conforme necessário */
+  background-size: contain; /* Garante que a imagem seja totalmente visível */
+  background-repeat: no-repeat; /* Não repete a imagem */
+  background-position: center; /* Centraliza a imagem horizontalmente */
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  justify-content: center; /* Centraliza o filho horizontalmente */
+  align-items: center; /* Centraliza o filho verticalmente */
+}
+
+#overlay {
+  background: rgba(0, 0, 0, 0.85); /* Fundo escuro para maior foco no conteúdo */
+  border-radius: 12px; /* Bordas arredondadas suavemente */
+  color: #F8F9FA; /* Texto em cinza claro para contraste e legibilidade */
+  text-shadow: 2px 2px 4px #000; /* Sombra no texto para destacá-lo sobre o fundo escuro */
+  padding: 30px; /* Mais espaço interno */
+  box-sizing: border-box;
+  max-width: 500px; /* Ajuste da largura máxima para um visual mais elegante */
+  margin: 40px auto; /* Maior margem superior/inferior para centralização vertical */
+  z-index: 10;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5); /* Sombra externa para efeito de elevação */
+}
+
+#overlay form {
+  display: flex;
+  flex-direction: column;
+  gap: 15px; /* Maior espaçamento entre campos */
+  align-items: center;
+}
+
+#overlay label, #overlay input[type=text], #overlay select, #overlay button {
+  width: 100%; /* Faz com que os campos ocupem toda a largura disponível */
+  font-size: 18px; /* Aumenta o tamanho da fonte para melhor legibilidade */
+}
+
+#overlay input[type=text], #overlay select {
+  padding: 12px; /* Mais espaçoso e confortável para interação */
+  border-radius: 8px; /* Bordas arredondadas */
+  border: 2px solid #007bff; /* Bordas mais destacadas */
+  background-color: rgba(255, 255, 255, 0.9); /* Levemente transparente para efeito estilístico */
+}
+
+#overlay button {
+  padding: 12px 20px;
+  border-radius: 8px;
+  background-color: #28a745; /* Cor de fundo do botão alterada para verde para ação positiva */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.4); /* Sombra para efeito de elevação */
+  font-weight: bold; /* Texto em negrito */
+  transition: background-color 0.2s, transform 0.2s; /* Suaviza as transições */
+}
+
+#overlay button:hover {
+  background-color: #218838; /* Cor mais escura ao passar o mouse */
+  transform: translateY(-2px); /* Leve elevação */
+}
+
+#overlay button:active {
+  transform: translateY(1px); /* Efeito de pressionar */
+}
+
+#gameBoard, #playerList {
+  display: none; /* Elementos são inicialmente escondidos e mostrados via JavaScript */
+}
+
+#gameLobby {
+  display: none;
+  position: fixed; /* Se necessário, para ficar visível acima de outros elementos */
+  top: 50px; /* Posição ajustada para não sobrepor o topo da página */
+  left: 50%; /* Centraliza horizontalmente */
+  transform: translateX(-50%); /* Ajuste fino para centralização exata */
+  width: auto; /* Autoajuste com base no conteúdo */
+  background: rgba(0, 0, 0, 0.9);
+  color: #F8F9FA;
+  padding: 20px;
+  box-sizing: border-box;
+  border-radius: 12px;
+  z-index: 12; /* Garante que esteja acima de outros elementos, como o overlay */
+}
+
+#playerList {
+  text-align: center;
+  font-size: 20px; /* Aumenta o tamanho da fonte para melhor legibilidade */
+  padding: 10px 0; /* Adiciona um pouco de espaço vertical */
+  border-top: 2px solid #28a745; /* Linha divisória estilizada */
+}
+
+#playersInGame {
+  display: none; /* Continua inicialmente escondida */
+  position: fixed;
+  left: 0;
+  top: 0;
+  width: 250px; /* Aumento da largura para acomodar melhor o texto */
+  height: 100%;
+  overflow-y: auto;
+  background: rgba(0, 0, 0, 0.9); /* Torna o fundo um pouco mais escuro */
+  color: #F8F9FA; /* Texto em cinza claro para melhor contraste */
+  padding: 20px;
+  box-sizing: border-box;
+  font-size: 18px; /* Ajuste fino do tamanho da fonte */
+  border-right: 3px solid #007bff; /* Adiciona uma borda divisória */
+}
+
+#playerTurnInfo {
+  margin-top: 20px;
+  background-color: rgba(255, 255, 255, 0.1); /* Mantém o fundo leve */
+  padding: 15px;
+  border-radius: 8px; /* Bordas mais arredondadas */
+  font-size: 18px; /* Tamanho da fonte ajustado */
+  border: 1px solid #38a49f; /* Borda sutil para destaque */
+}
+
+#playerTurn, #yourTurn {
+  color: #F8F9FA; /* Texto em cinza claro */
+  font-weight: 600; /* Peso da fonte para destaque */
+  margin-bottom: 10px; /* Espaçamento para separar do próximo texto */
+}
+
+.player-item {
+  margin-bottom: 20px; /* Espaço maior entre os itens */
+  background-color: rgba(255, 255, 255, 0.1); /* Fundo levemente visível */
+  padding: 10px;
+  border-radius: 8px; /* Bordas arredondadas */
+  border-left: 4px solid #007bff; /* Borda esquerda colorida para identificação */
+  display: flex;
+  align-items: center; /* Alinha os itens internos verticalmente */
+}
+
+#waitingMessage {
+  color: #FFD700; /* Uma cor que destaque, como dourado */
+  font-weight: bold; /* Deixa o texto em negrito para destacar */
+  margin-top: 20px; /* Espaço acima da mensagem */
+  text-align: center; /* Garante que a mensagem esteja centralizada */
+  max-width: 200px; /* Largura máxima da mensagem*/
+}
+
+.pawn {
+  position: absolute;
+  width: 50px; /* Ajuste conforme necessário para o seu tabuleiro */
+  height: 50px; /* Ajuste conforme necessário para o seu tabuleiro */
+  z-index: 5; /* Garante que fique acima do tabuleiro */
+  transform: translate(-50%, -50%); /* Centraliza o peão nas coordenadas especificadas */
+}
+
+#startGameButton {
+  padding: 10px 15px;
+  border: none;
+  border-radius: 5px;
+  background-color: #28a745; /* Cor de destaque */
+  color: white;
+  cursor: pointer;
+  font-size: 16px;
+  margin-top: 20px;
+}
+
+#startGameButton:hover {
+  background-color: #218838; /* Cor do botão ao passar o mouse */
+}
+
+.colorSquare {
+  display: inline-block;
+  width: 15px; /* Reduzido para melhor alinhamento */
+  height: 15px; /* Reduzido para melhor alinhamento */
+  margin-right: 10px;
+  border: 1px solid white; /* Borda branca adicionada */
+  vertical-align: middle; /* Alinha verticalmente com o texto */
+}
+
+.player-cards-container, .game-actions {
+  background-color: rgba(255, 255, 255, 0.1); /* Fundo semi-transparente para integrar com o fundo preto */
+  border: 2px solid #5bdac9; /* Borda verde para um destaque sutil */
+  border-radius: 8px;
+  box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.5); /* Sombra para adicionar profundidade */
+  color: #F8F9FA; /* Texto em cinza claro para contraste */
+  font-size: 18px; /* Aumento do tamanho da fonte */
+  padding: 20px;
+  padding-top: 10px;
+  position: fixed;
+  right: 20px;
+  top: 20px;
+  width: 250px; /* Uniformiza a largura */
+  z-index: 100;
+  transition: all 0.3s ease; /* Suaviza a transição de todos os efeitos */
+}
+
+.game-actions {
+  font-size: 18px;
+  top: calc(100% - 300px); /* Ajuste conforme necessário para alinhar corretamente */
+}
+
+.player-card {
+  padding: 15px 20px;
+  background-color: rgba(50, 50, 50, 0.8); /* Fundo mais escuro para os cartões */
+  border: 1px solid #007bff; /* Mantém a borda azul para consistência */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
+  margin-bottom: 15px;
+  border-radius: 6px;
+  line-height: 1.5;
+}
+
+.player-card:hover {
+  transform: translateY(-3px); /* Efeito de elevação ao passar o mouse */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3); /* Sombra maior para destacar */
+}
+
+.game-actions:hover {
+  transform: scale(1.05); /* Efeito de hover para indicar interatividade */
+}
+
+.game-actions h3 {
+  text-align: center; /* Certifica-se de que o título está centralizado */
+  margin-bottom: 24px; /* Espaço extra abaixo do título */
+}
+
+.player-cards-title {
+  text-align: center; /* Centraliza o título */
+  color: #F8F9FA; /* Cor do texto em cinza claro para contraste com o fundo escuro */
+  margin-bottom: 24px; /* Espaço extra abaixo do título */
+  font-size: 20px; /* Tamanho do texto para destaque */
+  padding: 2px 0; /* Espaçamento vertical */
+  border-bottom: 2px solid #5bdac9; /* Linha sob o título para separação visual */
+}
+
+.game-actions button, .player-cards-container button {
+  width: 80%; /* Faz os botões ocuparem 80% do contêiner para centralização */
+  margin: 10px auto; /* Margem automática para centralizar horizontalmente */
+  display: block; /* Garante que os botões fiquem em linhas separadas */
+}
+
+.game-actions button {
+  padding: 12px 20px; /* Aumento do espaçamento interno para mais conforto */
+  font-size: 18px; /* Aumento do tamanho da fonte para melhor legibilidade */
+  color: #F8F9FA; /* Cor de texto claro para contraste */
+  background: #007bff; /* Cor de fundo azul sólida para destaque */
+  border: none; /* Remove a borda padrão */
+  border-radius: 5px; /* Bordas arredondadas para suavidade */
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2); /* Sombra para efeito 3D */
+  margin-bottom: 10px; /* Espaçamento abaixo do botão */
+  cursor: pointer; /* Muda o cursor para indicar clicabilidade */
+  transition: background-color 0.2s, box-shadow 0.2s, transform 0.2s; /* Transições suaves para interação */
+}
+
+.game-actions button:hover {
+  background-color: #0056b3; /* Escurece o botão ao passar o mouse */
+  box-shadow: 0px 6px 12px rgba(0, 0, 0, 0.3); /* Sombra maior para efeito de hover */
+}
+
+.game-actions button:active {
+  background-color: #004494; /* Ainda mais escuro ao clicar */
+  box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.3); /* Sombra menor para efeito de pressionar */
+  transform: translateY(1px); /* Move o botão para baixo, simulando pressionamento */
+}
+
+.game-actions button:focus {
+  outline: 2px solid #0056b3; /* Adiciona um contorno para indicar foco */
+  outline-offset: 2px; /* Distância do contorno em relação ao botão */
+}
+
+#roomSelectionModal {
+  background: rgba(0, 0, 0, 0.85);
+  border-radius: 12px;
+  color: #F8F9FA;
+  text-shadow: 2px 2px 4px #000;
+  padding: 30px;
+  box-sizing: border-box;
+  max-width: 500px;
+  margin: 40px auto;
+  z-index: 1050; /* Certifique-se de que seja maior que o overlay de "À VOTRE TOUR" */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+  position: fixed;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 15px;
+}
+
+#roomSelectionModal select {
+  width: 100%;
+  font-size: 18px;
+  padding: 12px;
+  border-radius: 8px;
+  border: 2px solid #007bff;
+  background-color: rgba(255, 255, 255, 0.9);
+}
+
+#roomSelectionModal button {
+  padding: 12px 20px;
+  border-radius: 8px;
+  background-color: #28a745;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
+  font-weight: bold;
+  width: auto; /* Ajusta automaticamente a largura baseada no conteúdo */
+  transition: background-color 0.2s, transform 0.2s;
+  cursor: pointer;
+  color: white;
+}
+
+#roomSelectionModal button:hover {
+  background-color: #218838;
+  transform: translateY(-2px);
+}
+
+#roomSelectionModal button:active {
+  transform: translateY(1px);
+}
+
+#hypothesisModal {
+  background: rgba(0, 0, 0, 0.85);
+  border-radius: 12px;
+  color: #F8F9FA;
+  text-shadow: 2px 2px 4px #000;
+  padding: 30px;
+  box-sizing: border-box;
+  max-width: 500px;
+  margin: 40px auto;
+  z-index: 1050; /* Certifique-se de que seja maior que o overlay de "À VOTRE TOUR" */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+  position: fixed;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 15px;
+}
+
+#hypothesisModal select, #hypothesisModal p {
+  width: 100%;
+  font-size: 18px;
+  padding: 12px;
+  border-radius: 8px;
+  border: 2px solid #007bff;
+  background-color: rgba(255, 255, 255, 0.9);
+  color: #000; /* Para garantir visibilidade do texto */
+}
+
+#hypothesisModal button {
+  padding: 12px 20px;
+  border-radius: 8px;
+  background-color: #dc3545; /* Cor vermelha para ação de "Faire une Hypothèse" */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
+  font-weight: bold;
+  width: auto; /* Ajusta automaticamente a largura baseada no conteúdo */
+  transition: background-color 0.2s, transform 0.2s;
+  cursor: pointer;
+  color: white;
+}
+
+#hypothesisModal button:hover {
+  background-color: #c82333;
+  transform: translateY(-2px);
+}
+
+#hypothesisModal button:active {
+  transform: translateY(1px);
+}
+
+#hypothesisModal p {
+  margin-bottom: 15px; /* Adiciona um espaço antes do botão */
+  background-color: transparent; /* Mantém o fundo transparente */
+  border: none; /* Remove a borda */
+  color: #F8F9FA; /* Mantém a cor clara para contraste */
+  text-align: center; /* Centraliza o texto */
+}
+
+.room-display {
+  background-color: rgba(255, 255, 255, 0.9); /* Cor de fundo levemente transparente */
+  border: 2px solid #007bff; /* Bordas coloridas */
+  border-radius: 8px; /* Bordas arredondadas */
+  padding: 12px; /* Espaçamento interno para o texto */
+  font-size: 18px; /* Tamanho da fonte */
+  margin: 10px 0; /* Margem para separar dos outros elementos */
+  width: calc(100% - 24px); /* Largura ajustada para levar em consideração o padding */
+  box-sizing: border-box; /* Garante que o padding não adicione largura extra */
+  display: block; /* Faz com que ocupe a linha inteira */
+  color: #333; /* Cor do texto */
+}
+
+#hypothesisRefutedModal {
+  background: rgba(0, 0, 0, 0.85);
+  border-radius: 12px;
+  color: #F8F9FA;
+  text-shadow: 2px 2px 4px #000;
+  padding: 30px;
+  box-sizing: border-box;
+  max-width: 500px;
+  margin: 40px auto;
+  z-index: 1050; /* Para garantir visibilidade acima de outros elementos */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+  position: fixed;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 15px;
+}
+
+#hypothesisRefutedModal p, #hypothesisRefutedModal h2 {
+  width: 100%;
+  text-align: center; /* Centraliza o texto para melhor leitura */
+  font-size: 18px; /* Mantém a legibilidade */
+  padding: 12px;
+  border-radius: 8px;
+  background-color: rgba(106, 38, 38, 0.268); /* Fundo ligeiramente transparente para manter o foco no texto */
+  color: #F8F9FA; /* Texto em cor clara para contraste */
+  margin-bottom: 15px; /* Espaço antes do próximo elemento */
+  border: none; /* Remove borda para elementos de texto */
+}
+
+#hypothesisRefutedModal button {
+  padding: 12px 20px;
+  border-radius: 8px;
+  background-color: #dc3545; /* Cor vermelha para destacar a ação */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
+  font-weight: bold;
+  width: auto; /* Ajusta a largura conforme o conteúdo */
+  transition: background-color 0.2s, transform 0.2s;
+  cursor: pointer;
+  color: white;
+}
+
+#hypothesisRefutedModal button:hover {
+  background-color: #c82333; /* Cor mais escura ao passar o mouse */
+  transform: translateY(-2px); /* Efeito de levantar ligeiramente */
+}
+
+#hypothesisRefutedModal button:active {
+  transform: translateY(1px); /* Efeito de pressionar */
+}
+
+#hypothesisIncorrectModal {
+  background: rgba(0, 0, 0, 0.85);
+  border-radius: 12px;
+  color: #F8F9FA;
+  text-shadow: 2px 2px 4px #000;
+  padding: 30px;
+  box-sizing: border-box;
+  max-width: 500px;
+  margin: 40px auto;
+  z-index: 1050; /* Certifique-se de que seja maior que o overlay de "À VOTRE TOUR" */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+  position: fixed;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 15px;
+}
+
+#hypothesisIncorrectModal p, #hypothesisIncorrectModal h2 {
+  width: 100%;
+  font-size: 18px;
+  padding: 12px;
+  background-color: rgba(255, 55, 55, 0.7); /* Um fundo vermelho translúcido para indicar erro */
+  border: 1px solid #dc3545; /* Borda vermelha para reforçar a atenção */
+  border-radius: 8px;
+  color: #F8F9FA; /* Texto claro para contraste */
+  text-align: center;
+  margin: 10px 0;
+}
+
+#hypothesisIncorrectModal button {
+  padding: 12px 20px;
+  border-radius: 8px;
+  background-color: #dc3545; /* Botão vermelho para ação negativa */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
+  font-weight: bold;
+  width: auto; /* Ajusta automaticamente a largura baseada no conteúdo */
+  transition: background-color 0.2s, transform 0.2s;
+  cursor: pointer;
+  color: white;
+}
+
+#hypothesisIncorrectModal button:hover {
+  background-color: #c82333; /* Um vermelho mais escuro para o hover */
+  transform: translateY(-2px);
+}
+
+#hypothesisIncorrectModal button:active {
+  transform: translateY(1px); /* Efeito de "pressionado" */
+}
+
+#victoryModal {
+  background: rgba(0, 0, 0, 0.85);
+  border-radius: 12px;
+  color: #F8F9FA;
+  text-shadow: 2px 2px 4px #000;
+  padding: 30px;
+  box-sizing: border-box;
+  max-width: 500px;
+  margin: 40px auto;
+  z-index: 1050;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+  position: fixed;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 15px;
+}
+
+#victoryModal button {
+  padding: 12px 20px;
+  border-radius: 8px;
+  background-color: #28a745;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
+  font-weight: bold;
+  transition: background-color 0.2s, transform 0.2s;
+  cursor: pointer;
+  color: white;
+}
+
+#victoryModal button:hover {
+  background-color: #218838;
+  transform: translateY(-2px);
+}
+
+#victoryModal button:active {
+  transform: translateY(1px);
+}
